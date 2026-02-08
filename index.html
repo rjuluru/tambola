@@ -266,6 +266,7 @@
     .winner-btn .undo-icon { font-size: 0.8rem; flex-shrink: 0; opacity: 0.6; cursor: pointer; }
     .winner-btn .undo-icon:hover { opacity: 1; }
 
+    .mobile-winners-panel { display: none; }
     .center-panel { display: flex; flex-direction: column; min-height: 0; }
     .grid-container {
       flex: 1; background: var(--bg-card); border-radius: 14px;
@@ -498,57 +499,59 @@
 
     /* ===== Mobile Landscape ===== */
     @media (max-height: 500px) and (orientation: landscape) {
-      .app { padding: 2px 10px; }
-      .header { padding: 1px 0; }
-      .header h1 { font-size: calc(0.85rem * var(--font-scale)); }
-      .header-actions .btn-icon { width: 28px; height: 28px; font-size: 0.8rem; }
+      .app { padding: 0.5vh 1.2vw 0.5vh; overflow: hidden; }
+      .header { padding: 0.3vh 0; }
+      .header h1 { font-size: calc(2.4vh * var(--font-scale)); line-height: 1.1; }
+      .header-actions .btn-icon { width: 5vh; height: 5vh; font-size: 2.5vh; border-radius: 1vh; }
 
       .main-layout {
-        grid-template-columns: 180px 1fr 170px;
-        gap: 6px; padding: 2px 0;
+        grid-template-columns: minmax(0, 22vw) minmax(0, 1fr) minmax(0, 20vw);
+        gap: 0.8vw; padding: 0; overflow: hidden; width: 100%;
       }
 
-      .left-panel { gap: 3px; }
-      .pick-section { padding: 2px 0; gap: 3px; }
+      .left-panel { gap: 0.5vh; overflow: hidden; min-width: 0; }
+      .pick-section { padding: 0; gap: 0.5vh; }
       .picked-number-display {
-        width: calc(60px * var(--font-scale)); height: calc(60px * var(--font-scale));
-        font-size: calc(2rem * var(--font-scale));
+        width: min(calc(12vh * var(--font-scale)), 18vw); height: min(calc(12vh * var(--font-scale)), 18vw);
+        font-size: calc(5.5vh * var(--font-scale));
       }
-      .picked-number-display .placeholder-text { font-size: calc(0.9rem * var(--font-scale)); }
-      .pick-info { font-size: calc(0.65rem * var(--font-scale)); }
-      .pick-buttons { gap: 4px; }
-      .btn-draw { padding: 5px 0; font-size: calc(0.75rem * var(--font-scale)); border-radius: 7px; }
-      .btn-auto { width: 30px; font-size: 0.75rem; border-radius: 7px; }
-      .cooldown-bar { height: 2px; }
-      .auto-timer-section { gap: 5px; padding: 1px 0; }
-      .auto-timer-ring { width: 22px; height: 22px; }
-      .auto-timer-text { font-size: calc(0.6rem * var(--font-scale)); }
-      .winners-title { font-size: calc(0.55rem * var(--font-scale)); }
-      .winners-section { gap: 2px; }
+      .picked-number-display .placeholder-text { font-size: calc(2.8vh * var(--font-scale)); }
+      .pick-info { font-size: calc(1.8vh * var(--font-scale)); }
+      .pick-buttons { gap: 0.5vh; }
+      .btn-draw { padding: 1vh 0; font-size: calc(2vh * var(--font-scale)); border-radius: 1vh; }
+      .btn-auto { width: 5vh; font-size: 2.5vh; border-radius: 1vh; }
+      .cooldown-bar { height: 0.5vh; }
+      .auto-timer-section { gap: 1vh; padding: 0.3vh 0; }
+      .auto-timer-ring { width: 5vh; height: 5vh; }
+      .auto-timer-text { font-size: calc(1.6vh * var(--font-scale)); }
+      .winners-title { font-size: calc(1.5vh * var(--font-scale)); }
+      .winners-section { gap: 0.5vh; }
       .winner-btn {
-        padding: 3px 6px; font-size: calc(0.6rem * var(--font-scale));
-        border-radius: 6px; gap: 4px;
+        padding: 0.6vh 1vh; font-size: calc(1.6vh * var(--font-scale));
+        border-radius: 1vh; gap: 0.6vh;
       }
-      .winner-btn .winner-icon { font-size: 0.7rem; }
-      .winner-btn .winner-name { font-size: calc(0.5rem * var(--font-scale)); }
-      .winner-btn .undo-icon { font-size: 0.65rem; }
+      .winner-btn .winner-icon { font-size: calc(1.6vh * var(--font-scale)); }
+      .winner-btn .winner-name { font-size: calc(1.3vh * var(--font-scale)); }
+      .winner-btn .undo-icon { font-size: calc(1.5vh * var(--font-scale)); }
 
-      .grid-container { padding: 4px; border-radius: 8px; }
-      .grid { gap: 2px; }
+      .center-panel { min-height: 0; overflow: hidden; }
+      .grid-container { padding: 0.5vh; border-radius: 1vh; min-height: 0; overflow: hidden; flex: 1; }
+      .grid { gap: 0.3vh; grid-template-rows: repeat(9, minmax(0, 1fr)); }
       .grid-cell {
-        font-size: calc(0.8rem * var(--font-scale));
-        border-radius: 4px;
+        font-size: calc(2vh * var(--font-scale));
+        border-radius: 0.6vh;
+        padding: 0; overflow: hidden;
       }
 
-      .right-panel { gap: 4px; }
-      .history-section { padding: 6px; border-radius: 8px; }
-      .history-header { margin-bottom: 4px; }
-      .history-header h3 { font-size: calc(0.55rem * var(--font-scale)); }
+      .right-panel { gap: 0.5vh; overflow: hidden; min-width: 0; }
+      .history-section { padding: 1vh; border-radius: 1vh; }
+      .history-header { margin-bottom: 0.5vh; }
+      .history-header h3 { font-size: calc(1.5vh * var(--font-scale)); }
       .history-chip {
-        font-size: calc(0.65rem * var(--font-scale));
-        padding: 2px 5px; border-radius: 4px;
+        font-size: calc(1.8vh * var(--font-scale));
+        padding: 0.4vh 0.8vh; border-radius: 0.6vh;
       }
-      .history-list { gap: 3px; }
+      .history-list { gap: 0.5vh; }
     }
 
     /* ===== Mobile Portrait ===== */
@@ -558,49 +561,74 @@
 
       .header h1 { font-size: calc(1.1rem * var(--font-scale)); }
 
+      /* Single column stacked layout */
       .main-layout {
-        display: grid;
-        grid-template-columns: minmax(140px, 200px) 1fr;
-        grid-template-rows: auto auto auto;
-        gap: 8px;
-        min-height: 0;
+        display: flex; flex-direction: column;
+        gap: 8px; min-height: 0;
       }
 
-      /* Draw panel: top-left */
+      /* 1) Picker: horizontal row */
       .left-panel {
-        grid-column: 1; grid-row: 1;
-        overflow: visible; min-height: 0;
+        display: flex; flex-direction: row; align-items: center;
+        gap: 10px; overflow: visible; min-height: auto;
+        flex-shrink: 0; order: 1;
+      }
+      .pick-section {
+        flex-direction: row; align-items: center; gap: 8px;
+        padding: 0; flex-shrink: 0;
       }
       .picked-number-display {
-        width: calc(80px * var(--font-scale)); height: calc(80px * var(--font-scale));
-        font-size: calc(2.5rem * var(--font-scale));
+        width: calc(56px * var(--font-scale)); height: calc(56px * var(--font-scale));
+        font-size: calc(1.8rem * var(--font-scale));
+        flex-shrink: 0;
       }
-      .picked-number-display .placeholder-text { font-size: calc(1rem * var(--font-scale)); }
-      .pick-info { font-size: calc(0.75rem * var(--font-scale)); }
-      .btn-draw { font-size: calc(0.85rem * var(--font-scale)); padding: 8px 0; }
+      .picked-number-display .placeholder-text { font-size: calc(0.9rem * var(--font-scale)); }
+      .pick-info { font-size: calc(0.7rem * var(--font-scale)); white-space: nowrap; }
+      .pick-buttons { flex-shrink: 0; width: auto; min-width: 120px; }
+      .btn-draw { font-size: calc(0.85rem * var(--font-scale)); padding: 8px 14px; }
       .btn-auto { width: 36px; font-size: 0.85rem; }
-      .auto-timer-section { justify-content: center; }
-      .auto-timer-text { font-size: calc(0.7rem * var(--font-scale)); }
-      .winners-title { font-size: calc(0.65rem * var(--font-scale)); }
-      .winner-btn { font-size: calc(0.72rem * var(--font-scale)); padding: 5px 8px; }
-      .winner-btn .winner-name { font-size: calc(0.6rem * var(--font-scale)); }
-      .winner-btn .winner-icon { font-size: 0.85rem; }
-      .winners-section { overflow: visible; }
+      .cooldown-bar { position: absolute; bottom: 0; left: 0; right: 0; }
+      .auto-timer-section { flex-shrink: 0; justify-content: center; }
+      .auto-timer-ring { width: 28px; height: 28px; }
+      .auto-timer-text { font-size: calc(0.65rem * var(--font-scale)); white-space: nowrap; }
+      /* Hide winners from left panel in portrait */
+      .winners-title { display: none; }
+      .winners-section { display: none; }
 
-      /* Grid: top-right */
-      .center-panel { grid-column: 2; grid-row: 1; }
-      .grid-container { padding: 5px; border-radius: 10px; }
-      .grid { gap: 2px; }
+      /* 2) Grid: full width, taller for breathing room */
+      .center-panel { order: 2; }
+      .grid-container { padding: 6px; border-radius: 10px; min-height: 60vh; }
+      .grid { gap: 3px; }
       .grid-cell {
-        font-size: calc(0.75rem * var(--font-scale));
+        font-size: calc(0.85rem * var(--font-scale));
         border-radius: 5px;
       }
 
-      /* History: below, full width */
-      .right-panel {
-        grid-column: 1 / -1; grid-row: 2;
-        overflow: visible;
+      /* 3) Winners: horizontal pills */
+      .mobile-winners-panel { display: flex !important; order: 3; flex-shrink: 0; }
+      .mobile-winners-pills {
+        display: flex; flex-wrap: wrap; gap: 6px; width: 100%;
+        justify-content: center;
       }
+      .mobile-winner-pill {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 6px 12px; border-radius: 20px;
+        border: 1px solid var(--border-color); background: var(--bg-cell);
+        color: var(--text-primary); font-size: calc(0.72rem * var(--font-scale));
+        font-weight: 600; cursor: pointer; transition: all var(--transition-speed);
+        white-space: nowrap;
+      }
+      .mobile-winner-pill:hover { border-color: var(--accent); background: var(--bg-cell-hover); }
+      .mobile-winner-pill.claimed {
+        background: var(--winner-claimed-bg); border-color: var(--success); cursor: default;
+      }
+      .mobile-winner-pill .pill-icon { font-size: 0.8rem; }
+      .mobile-winner-pill .pill-winner { color: var(--success); font-size: calc(0.6rem * var(--font-scale)); font-weight: 700; }
+      .mobile-winner-pill .pill-undo { font-size: 0.7rem; opacity: 0.6; cursor: pointer; margin-left: 2px; }
+      .mobile-winner-pill .pill-undo:hover { opacity: 1; }
+
+      /* 4) History */
+      .right-panel { order: 4; overflow: visible; }
       .history-section { border-radius: 10px; }
       .history-chip {
         font-size: calc(0.8rem * var(--font-scale));
@@ -619,21 +647,17 @@
     @media (max-width: 480px) and (orientation: portrait) {
       .app { padding: 4px 6px; }
       .header h1 { font-size: calc(0.95rem * var(--font-scale)); }
-      .main-layout {
-        grid-template-columns: minmax(120px, 160px) 1fr;
-        gap: 6px;
-      }
+      .left-panel { gap: 6px; }
       .picked-number-display {
-        width: calc(65px * var(--font-scale)); height: calc(65px * var(--font-scale));
-        font-size: calc(2rem * var(--font-scale));
+        width: calc(48px * var(--font-scale)); height: calc(48px * var(--font-scale));
+        font-size: calc(1.5rem * var(--font-scale));
       }
-      .pick-info { font-size: calc(0.65rem * var(--font-scale)); }
-      .grid-cell { font-size: calc(0.6rem * var(--font-scale)); border-radius: 4px; }
-      .grid { gap: 1.5px; }
-      .btn-draw { font-size: calc(0.78rem * var(--font-scale)); padding: 7px 0; }
+      .pick-info { font-size: calc(0.6rem * var(--font-scale)); }
+      .pick-buttons { min-width: 100px; }
+      .btn-draw { font-size: calc(0.78rem * var(--font-scale)); padding: 7px 10px; }
       .btn-auto { width: 32px; font-size: 0.8rem; }
-      .winner-btn { font-size: calc(0.65rem * var(--font-scale)); padding: 4px 6px; gap: 5px; }
-      .winner-btn .winner-icon { font-size: 0.75rem; }
+      .grid-cell { font-size: calc(0.7rem * var(--font-scale)); border-radius: 4px; }
+      .grid { gap: 1.5px; }
     }
   </style>
 </head>
@@ -680,6 +704,10 @@
         <div class="grid-container">
           <div class="grid" id="grid"></div>
         </div>
+      </div>
+
+      <div class="mobile-winners-panel" id="mobileWinnersPanel">
+        <div class="mobile-winners-pills" id="mobileWinnersPills"></div>
       </div>
 
       <div class="right-panel">
@@ -979,8 +1007,13 @@
 
     function renderWinners() {
       winnersSection.innerHTML = '';
+      const mobilePills = $('mobileWinnersPills');
+      mobilePills.innerHTML = '';
+
       settings.prizes.forEach(prize => {
         const winner = state.winners[prize.id];
+
+        // Desktop winner button
         const btn = document.createElement('div');
         btn.className = 'winner-btn' + (winner ? ' claimed' : '');
 
@@ -1014,6 +1047,30 @@
           });
         }
         winnersSection.appendChild(btn);
+
+        // Mobile pill
+        const pill = document.createElement('div');
+        pill.className = 'mobile-winner-pill' + (winner ? ' claimed' : '');
+        if (winner) {
+          pill.innerHTML = `<span class="pill-icon">✅</span><span>${prize.label}</span><span class="pill-winner">${escapeHtml(winner)}</span><span class="pill-undo" data-prize="${prize.id}" title="Revert">↩️</span>`;
+          pill.querySelector('.pill-undo').addEventListener('click', (e) => {
+            e.stopPropagation();
+            revertPrizeId = prize.id;
+            revertDesc.textContent = `Remove "${winner}" as winner for ${prize.label}?`;
+            revertOverlay.classList.add('open');
+          });
+        } else {
+          pill.innerHTML = `<span class="pill-icon">🏆</span><span>${prize.label}</span>`;
+          pill.addEventListener('click', () => {
+            activePrizeId = prize.id;
+            winnerDialogTitle.textContent = prize.label;
+            winnerDialogDesc.textContent = `Enter the winner's name for "${prize.label}".`;
+            winnerNameInput.value = '';
+            winnerOverlay.classList.add('open');
+            setTimeout(() => winnerNameInput.focus(), 100);
+          });
+        }
+        mobilePills.appendChild(pill);
       });
     }
 
