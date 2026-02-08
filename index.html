@@ -642,6 +642,7 @@
     <header class="header">
       <h1 id="appTitle">🎱 Tambola Draw</h1>
       <div class="header-actions">
+        <button class="btn btn-icon" id="fullscreenBtn" title="Fullscreen">⛶</button>
         <button class="btn btn-icon" id="settingsBtn" title="Settings">⚙️</button>
         <button class="btn btn-icon" id="newGameBtn" title="New Game">🔄</button>
       </div>
@@ -1437,6 +1438,21 @@
         revertOverlay.classList.remove('open');
         $('removePrizeOverlay').classList.remove('open');
       }
+    });
+
+    // ===== Fullscreen =====
+    const fullscreenBtn = $('fullscreenBtn');
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
+    document.addEventListener('fullscreenchange', () => {
+      fullscreenBtn.textContent = document.fullscreenElement ? '⛶' : '⛶';
+      fullscreenBtn.title = document.fullscreenElement ? 'Exit Fullscreen' : 'Fullscreen';
     });
 
     init();
