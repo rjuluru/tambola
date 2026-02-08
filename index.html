@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tambola Draw</title>
+  <style>
+    :root { --transition-speed: 0.25s; --font-scale: 1; }
+
+    [data-theme="dark"] {
+      --bg-primary: #0f172a; --bg-secondary: #1e293b; --bg-card: #1e293b;
+      --bg-popover: #1e293b; --bg-cell: #334155; --bg-cell-picked: #7c3aed;
+      --bg-cell-current: #facc15; --text-on-current: #1a1a00;
+      --bg-cell-previous: #c084fc; --text-on-previous: #fff;
+      --bg-cell-hover: #475569; --text-primary: #f1f5f9; --text-secondary: #94a3b8;
+      --text-on-picked: #fff; --border-color: #334155; --accent: #7c3aed;
+      --accent-hover: #6d28d9; --accent-glow: rgba(124,58,237,0.4);
+      --danger: #ef4444; --danger-hover: #dc2626; --success: #22c55e;
+      --warning: #f59e0b; --shadow: 0 4px 24px rgba(0,0,0,0.4);
+      --picked-number-bg: linear-gradient(135deg,#7c3aed,#a855f7);
+      --history-chip-bg: #334155; --winner-claimed-bg: #166534;
+      --overlay-bg: rgba(0,0,0,0.6); --cooldown-bar: #7c3aed;
+      --auto-timer-color: #a855f7;
+    }
+    [data-theme="light"] {
+      --bg-primary: #f8fafc; --bg-secondary: #fff; --bg-card: #fff;
+      --bg-popover: #fff; --bg-cell: #e2e8f0; --bg-cell-picked: #7c3aed;
+      --bg-cell-current: #eab308; --text-on-current: #1a1a00;
+      --bg-cell-previous: #a78bfa; --text-on-previous: #fff;
+      --bg-cell-hover: #cbd5e1; --text-primary: #1e293b; --text-secondary: #64748b;
+      --text-on-picked: #fff; --border-color: #e2e8f0; --accent: #7c3aed;
+      --accent-hover: #6d28d9; --accent-glow: rgba(124,58,237,0.3);
+      --danger: #ef4444; --danger-hover: #dc2626; --success: #22c55e;
+      --warning: #f59e0b; --shadow: 0 4px 24px rgba(0,0,0,0.1);
+      --picked-number-bg: linear-gradient(135deg,#7c3aed,#a855f7);
+      --history-chip-bg: #e2e8f0; --winner-claimed-bg: #bbf7d0;
+      --overlay-bg: rgba(0,0,0,0.3); --cooldown-bar: #7c3aed;
+      --auto-timer-color: #7c3aed;
+    }
+    [data-theme="ocean"] {
+      --bg-primary: #0c1222; --bg-secondary: #132038; --bg-card: #132038;
+      --bg-popover: #132038; --bg-cell: #1a2d4d; --bg-cell-picked: #0ea5e9;
+      --bg-cell-current: #fbbf24; --text-on-current: #1a1a00;
+      --bg-cell-previous: #38bdf8; --text-on-previous: #0c1222;
+      --bg-cell-hover: #234170; --text-primary: #e0f2fe; --text-secondary: #7dd3fc;
+      --text-on-picked: #fff; --border-color: #1a2d4d; --accent: #0ea5e9;
+      --accent-hover: #0284c7; --accent-glow: rgba(14,165,233,0.4);
+      --danger: #f43f5e; --danger-hover: #e11d48; --success: #34d399;
+      --warning: #fbbf24; --shadow: 0 4px 24px rgba(0,0,0,0.5);
+      --picked-number-bg: linear-gradient(135deg,#0ea5e9,#38bdf8);
+      --history-chip-bg: #1a2d4d; --winner-claimed-bg: #065f46;
+      --overlay-bg: rgba(0,0,0,0.6); --cooldown-bar: #0ea5e9;
+      --auto-timer-color: #38bdf8;
+    }
+    [data-theme="sunset"] {
+      --bg-primary: #1a0a0a; --bg-secondary: #2d1515; --bg-card: #2d1515;
+      --bg-popover: #2d1515; --bg-cell: #3d1f1f; --bg-cell-picked: #f97316;
+      --bg-cell-current: #fbbf24; --text-on-current: #1a0a0a;
+      --bg-cell-previous: #fb923c; --text-on-previous: #1a0a0a;
+      --bg-cell-hover: #4d2929; --text-primary: #fef3c7; --text-secondary: #fdba74;
+      --text-on-picked: #fff; --border-color: #3d1f1f; --accent: #f97316;
+      --accent-hover: #ea580c; --accent-glow: rgba(249,115,22,0.4);
+      --danger: #ef4444; --danger-hover: #dc2626; --success: #4ade80;
+      --warning: #fbbf24; --shadow: 0 4px 24px rgba(0,0,0,0.5);
+      --picked-number-bg: linear-gradient(135deg,#f97316,#fb923c);
+      --history-chip-bg: #3d1f1f; --winner-claimed-bg: #166534;
+      --overlay-bg: rgba(0,0,0,0.6); --cooldown-bar: #f97316;
+      --auto-timer-color: #fb923c;
+    }
+    [data-theme="forest"] {
+      --bg-primary: #0a1a0a; --bg-secondary: #152d15; --bg-card: #152d15;
+      --bg-popover: #152d15; --bg-cell: #1f3d1f; --bg-cell-picked: #22c55e;
+      --bg-cell-current: #fbbf24; --text-on-current: #0a1a0a;
+      --bg-cell-previous: #4ade80; --text-on-previous: #052e16;
+      --bg-cell-hover: #295529; --text-primary: #dcfce7; --text-secondary: #86efac;
+      --text-on-picked: #052e16; --border-color: #1f3d1f; --accent: #22c55e;
+      --accent-hover: #16a34a; --accent-glow: rgba(34,197,94,0.4);
+      --danger: #ef4444; --danger-hover: #dc2626; --success: #4ade80;
+      --warning: #fbbf24; --shadow: 0 4px 24px rgba(0,0,0,0.5);
+      --picked-number-bg: linear-gradient(135deg,#22c55e,#4ade80);
+      --history-chip-bg: #1f3d1f; --winner-claimed-bg: #166534;
+      --overlay-bg: rgba(0,0,0,0.6); --cooldown-bar: #22c55e;
+      --auto-timer-color: #4ade80;
+    }
+    [data-theme="rosegold"] {
+      --bg-primary: #1a1018; --bg-secondary: #2a1c26; --bg-card: #2a1c26;
+      --bg-popover: #2a1c26; --bg-cell: #3d2a36; --bg-cell-picked: #e879a0;
+      --bg-cell-current: #fbbf24; --text-on-current: #1a1018;
+      --bg-cell-previous: #f9a8c9; --text-on-previous: #1a1018;
+      --bg-cell-hover: #4d3644; --text-primary: #fce4ec; --text-secondary: #f48fb1;
+      --text-on-picked: #fff; --border-color: #3d2a36; --accent: #e879a0;
+      --accent-hover: #d4567e; --accent-glow: rgba(232,121,160,0.4);
+      --danger: #ef4444; --danger-hover: #dc2626; --success: #4ade80;
+      --warning: #fbbf24; --shadow: 0 4px 24px rgba(0,0,0,0.5);
+      --picked-number-bg: linear-gradient(135deg,#e879a0,#f9a8c9);
+      --history-chip-bg: #3d2a36; --winner-claimed-bg: #2e4a3a;
+      --overlay-bg: rgba(0,0,0,0.6); --cooldown-bar: #e879a0;
+      --auto-timer-color: #f9a8c9;
+    }
+    [data-theme="midnight"] {
+      --bg-primary: #0a0a1a; --bg-secondary: #12122a; --bg-card: #12122a;
+      --bg-popover: #12122a; --bg-cell: #1e1e3d; --bg-cell-picked: #6366f1;
+      --bg-cell-current: #fbbf24; --text-on-current: #0a0a1a;
+      --bg-cell-previous: #818cf8; --text-on-previous: #0a0a1a;
+      --bg-cell-hover: #2a2a55; --text-primary: #e0e7ff; --text-secondary: #a5b4fc;
+      --text-on-picked: #fff; --border-color: #1e1e3d; --accent: #6366f1;
+      --accent-hover: #4f46e5; --accent-glow: rgba(99,102,241,0.4);
+      --danger: #ef4444; --danger-hover: #dc2626; --success: #34d399;
+      --warning: #fbbf24; --shadow: 0 4px 24px rgba(0,0,0,0.6);
+      --picked-number-bg: linear-gradient(135deg,#6366f1,#818cf8);
+      --history-chip-bg: #1e1e3d; --winner-claimed-bg: #1a3a2a;
+      --overlay-bg: rgba(0,0,0,0.7); --cooldown-bar: #6366f1;
+      --auto-timer-color: #818cf8;
+    }
+    [data-theme="royal"] {
+      --bg-primary: #110a1e; --bg-secondary: #1c1230; --bg-card: #1c1230;
+      --bg-popover: #1c1230; --bg-cell: #2d1f4e; --bg-cell-picked: #a855f7;
+      --bg-cell-current: #fbbf24; --text-on-current: #110a1e;
+      --bg-cell-previous: #c084fc; --text-on-previous: #110a1e;
+      --bg-cell-hover: #3d2d66; --text-primary: #f3e8ff; --text-secondary: #d8b4fe;
+      --text-on-picked: #fff; --border-color: #2d1f4e; --accent: #a855f7;
+      --accent-hover: #9333ea; --accent-glow: rgba(168,85,247,0.4);
+      --danger: #ef4444; --danger-hover: #dc2626; --success: #4ade80;
+      --warning: #fbbf24; --shadow: 0 4px 24px rgba(0,0,0,0.6);
+      --picked-number-bg: linear-gradient(135deg,#a855f7,#c084fc);
+      --history-chip-bg: #2d1f4e; --winner-claimed-bg: #1a3a2a;
+      --overlay-bg: rgba(0,0,0,0.7); --cooldown-bar: #a855f7;
+      --auto-timer-color: #c084fc;
+    }
+    [data-theme="champagne"] {
+      --bg-primary: #1c1a14; --bg-secondary: #2a2720; --bg-card: #2a2720;
+      --bg-popover: #2a2720; --bg-cell: #3d3930; --bg-cell-picked: #d4a843;
+      --bg-cell-current: #fef08a; --text-on-current: #1c1a14;
+      --bg-cell-previous: #e8c96a; --text-on-previous: #1c1a14;
+      --bg-cell-hover: #4d4838; --text-primary: #fef9ef; --text-secondary: #d4c9a8;
+      --text-on-picked: #1c1a14; --border-color: #3d3930; --accent: #d4a843;
+      --accent-hover: #b8922e; --accent-glow: rgba(212,168,67,0.4);
+      --danger: #ef4444; --danger-hover: #dc2626; --success: #4ade80;
+      --warning: #fbbf24; --shadow: 0 4px 24px rgba(0,0,0,0.5);
+      --picked-number-bg: linear-gradient(135deg,#d4a843,#e8c96a);
+      --history-chip-bg: #3d3930; --winner-claimed-bg: #2a3a20;
+      --overlay-bg: rgba(0,0,0,0.6); --cooldown-bar: #d4a843;
+      --auto-timer-color: #e8c96a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%; overflow: hidden;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-primary); color: var(--text-primary);
+      transition: background var(--transition-speed), color var(--transition-speed);
+    }
+
+    .app { height: 100vh; display: flex; flex-direction: column; padding: 6px 16px; }
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 4px 0; flex-shrink: 0;
+    }
+    .header h1 {
+      font-size: calc(1.4rem * var(--font-scale)); font-weight: 800;
+      background: var(--picked-number-bg); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .header-actions { display: flex; gap: 6px; align-items: center; }
+
+    .main-layout {
+      flex: 1; display: grid; grid-template-columns: 260px 1fr 230px;
+      gap: 12px; min-height: 0; padding: 4px 0;
+    }
+
+    .left-panel { display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow: hidden; }
+    .pick-section {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 6px 0; flex-shrink: 0;
+    }
+    .picked-number-display {
+      width: calc(140px * var(--font-scale)); height: calc(140px * var(--font-scale));
+      border-radius: 50%; background: var(--picked-number-bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: calc(4rem * var(--font-scale)); font-weight: 800; color: #fff;
+      box-shadow: 0 0 50px var(--accent-glow);
+      transition: transform 0.3s; position: relative;
+    }
+    .picked-number-display.pop { animation: popIn 0.4s ease; }
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0.5; }
+      60% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .picked-number-display .placeholder-text {
+      font-size: calc(1.4rem * var(--font-scale)); font-weight: 600; opacity: 0.7;
+    }
+    .pick-info {
+      font-size: calc(1rem * var(--font-scale)); color: var(--text-secondary);
+      font-weight: 600; text-align: center;
+    }
+
+    .pick-buttons { display: flex; gap: 6px; flex-shrink: 0; width: 100%; }
+    .btn-draw {
+      flex: 1; background: var(--accent); color: #fff; border: none;
+      border-radius: 10px; padding: 10px 0; font-size: calc(1rem * var(--font-scale));
+      font-weight: 700; cursor: pointer; transition: all var(--transition-speed);
+    }
+    .btn-draw:hover { background: var(--accent-hover); box-shadow: 0 0 16px var(--accent-glow); }
+    .btn-draw:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+
+    .btn-auto {
+      width: 44px; background: var(--bg-cell); color: var(--text-primary);
+      border: 1px solid var(--border-color); border-radius: 10px;
+      font-size: 1rem; cursor: pointer; transition: all var(--transition-speed);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-auto:hover { background: var(--bg-cell-hover); }
+    .btn-auto.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .cooldown-bar {
+      height: 3px; background: var(--bg-cell); border-radius: 2px;
+      overflow: hidden; flex-shrink: 0; width: 100%;
+    }
+    .cooldown-bar-inner {
+      height: 100%; width: 0%; background: var(--cooldown-bar);
+      border-radius: 2px; transition: width 0.1s linear;
+    }
+
+    .auto-timer-section {
+      display: none; flex-shrink: 0; align-items: center; gap: 10px; padding: 2px 0;
+    }
+    .auto-timer-section.visible { display: flex; }
+    .auto-timer-ring { width: 34px; height: 34px; flex-shrink: 0; }
+    .auto-timer-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .auto-timer-ring .ring-bg { fill: none; stroke: var(--bg-cell); stroke-width: 3; }
+    .auto-timer-ring .ring-fg {
+      fill: none; stroke: var(--auto-timer-color); stroke-width: 3;
+      stroke-linecap: round; transition: stroke-dashoffset 0.15s linear;
+    }
+    .auto-timer-text {
+      font-size: calc(0.85rem * var(--font-scale)); font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .winners-section {
+      flex: 1; min-height: 0; overflow-y: auto; display: flex;
+      flex-direction: column; gap: 4px;
+    }
+    .winners-title {
+      font-size: calc(0.75rem * var(--font-scale)); font-weight: 700;
+      color: var(--text-secondary); text-transform: uppercase;
+      letter-spacing: 0.05em; flex-shrink: 0;
+    }
+    .winner-btn {
+      width: 100%; padding: 7px 10px; border-radius: 10px;
+      border: 1px solid var(--border-color); background: var(--bg-cell);
+      color: var(--text-primary); font-size: calc(0.85rem * var(--font-scale));
+      font-weight: 600; cursor: pointer; transition: all var(--transition-speed);
+      text-align: left; display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+    }
+    .winner-btn:hover { background: var(--bg-cell-hover); border-color: var(--accent); }
+    .winner-btn.claimed { background: var(--winner-claimed-bg); border-color: var(--success); cursor: default; }
+    .winner-btn .winner-label { flex: 1; }
+    .winner-btn .winner-name {
+      font-size: calc(0.72rem * var(--font-scale)); color: var(--success);
+      font-weight: 700; margin-top: 1px;
+    }
+    .winner-btn .winner-icon { font-size: 1rem; flex-shrink: 0; }
+    .winner-btn .undo-icon { font-size: 0.8rem; flex-shrink: 0; opacity: 0.6; cursor: pointer; }
+    .winner-btn .undo-icon:hover { opacity: 1; }
+
+    .center-panel { display: flex; flex-direction: column; min-height: 0; }
+    .grid-container {
+      flex: 1; background: var(--bg-card); border-radius: 14px;
+      padding: 8px; border: 1px solid var(--border-color);
+      box-shadow: var(--shadow); display: flex; flex-direction: column;
+    }
+    .grid {
+      flex: 1; display: grid; grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(9, 1fr); gap: 4px;
+    }
+    .grid-cell {
+      border-radius: 8px; display: flex; align-items: center;
+      justify-content: center; font-weight: 800;
+      font-size: calc(1.5rem * var(--font-scale));
+      background: var(--bg-cell); color: var(--text-primary);
+      transition: all var(--transition-speed); cursor: default; user-select: none;
+    }
+    .grid-cell:hover { background: var(--bg-cell-hover); }
+    .grid-cell.picked { background: var(--bg-cell-picked); color: var(--text-on-picked); }
+    .grid-cell.picked:hover { background: var(--bg-cell-picked); }
+    .grid-cell.cell-current {
+      background: var(--bg-cell-current) !important; color: var(--text-on-current) !important;
+      box-shadow: 0 0 14px var(--bg-cell-current);
+      animation: currentPulse 1.2s ease-in-out infinite;
+    }
+    .grid-cell.cell-current:hover { background: var(--bg-cell-current) !important; }
+    .grid-cell.cell-previous {
+      background: var(--bg-cell-previous) !important; color: var(--text-on-previous) !important;
+      box-shadow: 0 0 8px var(--bg-cell-previous);
+    }
+    .grid-cell.cell-previous:hover { background: var(--bg-cell-previous) !important; }
+    .grid-cell.just-picked { animation: cellPop 0.5s ease; }
+    @keyframes cellPop {
+      0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); }
+    }
+    @keyframes currentPulse {
+      0%, 100% { box-shadow: 0 0 10px var(--bg-cell-current); }
+      50% { box-shadow: 0 0 22px var(--bg-cell-current); }
+    }
+
+    .right-panel { display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow: hidden; }
+    .history-section {
+      flex: 1; background: var(--bg-card); border-radius: 14px;
+      padding: 10px; border: 1px solid var(--border-color);
+      display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+    }
+    .history-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px; flex-shrink: 0;
+    }
+    .history-header h3 {
+      font-size: calc(0.75rem * var(--font-scale)); font-weight: 700;
+      color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .history-count-selector { display: flex; align-items: center; gap: 4px; }
+    .history-count-selector label { font-size: 0.7rem; color: var(--text-secondary); }
+    .history-count-selector select {
+      background: var(--bg-cell); color: var(--text-primary);
+      border: 1px solid var(--border-color); border-radius: 6px;
+      padding: 2px 6px; font-size: 0.75rem; cursor: pointer;
+    }
+    .history-list {
+      flex: 1; overflow-y: auto; display: flex; flex-wrap: wrap;
+      gap: 5px; align-content: flex-start;
+    }
+    .history-chip {
+      background: var(--history-chip-bg); color: var(--text-primary);
+      padding: 4px 8px; border-radius: 6px;
+      font-size: calc(0.95rem * var(--font-scale));
+      font-weight: 700; min-width: 30px; text-align: center;
+    }
+    .history-chip:first-child { background: var(--accent); color: #fff; }
+    .history-empty { color: var(--text-secondary); font-size: 0.85rem; font-style: italic; }
+
+    .btn {
+      border: none; border-radius: 10px; cursor: pointer; font-weight: 600;
+      font-size: 0.85rem; transition: all var(--transition-speed);
+      display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    }
+    .btn-icon {
+      width: 36px; height: 36px; border-radius: 10px; background: var(--bg-cell);
+      color: var(--text-primary); display: flex; align-items: center;
+      justify-content: center; font-size: 1rem; border: 1px solid var(--border-color);
+    }
+    .btn-icon:hover { background: var(--bg-cell-hover); }
+    .btn-danger { background: var(--danger); color: #fff; padding: 10px 20px; }
+    .btn-danger:hover { background: var(--danger-hover); }
+    .btn-secondary {
+      background: var(--bg-cell); color: var(--text-primary);
+      border: 1px solid var(--border-color); padding: 10px 20px;
+    }
+    .btn-secondary:hover { background: var(--bg-cell-hover); }
+
+    .popover-overlay, .confirm-overlay, .winner-overlay {
+      position: fixed; inset: 0; background: var(--overlay-bg); z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .popover-overlay.open, .confirm-overlay.open, .winner-overlay.open {
+      opacity: 1; pointer-events: all;
+    }
+    .confirm-overlay { z-index: 200; }
+    .winner-overlay { z-index: 150; }
+
+    .popover {
+      background: var(--bg-popover); border: 1px solid var(--border-color);
+      border-radius: 20px; padding: 24px; width: 90%; max-width: 520px;
+      max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow);
+      transform: scale(0.95); transition: transform 0.2s;
+    }
+    .popover-overlay.open .popover { transform: scale(1); }
+    .popover h2 {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .popover h2 .close-btn {
+      background: none; border: none; color: var(--text-secondary);
+      font-size: 1.4rem; cursor: pointer; padding: 4px; line-height: 1;
+    }
+    .popover h2 .close-btn:hover { color: var(--text-primary); }
+
+    .setting-group { margin-bottom: 14px; }
+    .setting-group > label {
+      display: block; font-size: 0.75rem; font-weight: 700;
+      color: var(--text-secondary); text-transform: uppercase;
+      letter-spacing: 0.05em; margin-bottom: 6px;
+    }
+    .theme-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .theme-btn {
+      padding: 7px 4px; border-radius: 10px; border: 2px solid var(--border-color);
+      background: var(--bg-cell); color: var(--text-primary); font-size: 0.72rem;
+      font-weight: 600; cursor: pointer; transition: all var(--transition-speed);
+      text-align: center;
+    }
+    .theme-btn:hover { border-color: var(--accent); }
+    .theme-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between; padding: 5px 0;
+    }
+    .toggle-row span { font-size: 0.85rem; color: var(--text-primary); }
+    .toggle { position: relative; width: 40px; height: 22px; cursor: pointer; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0; background: var(--bg-cell);
+      border-radius: 22px; transition: background var(--transition-speed);
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute; width: 16px; height: 16px;
+      border-radius: 50%; background: #fff; top: 3px; left: 3px;
+      transition: transform var(--transition-speed);
+    }
+    .toggle input:checked + .toggle-slider { background: var(--accent); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+    .speed-selector, .font-size-selector { display: flex; gap: 6px; }
+    .speed-btn, .font-size-btn {
+      padding: 5px 10px; border-radius: 8px; border: 2px solid var(--border-color);
+      background: var(--bg-cell); color: var(--text-primary); font-size: 0.78rem;
+      font-weight: 600; cursor: pointer; transition: all var(--transition-speed);
+    }
+    .speed-btn:hover, .font-size-btn:hover { border-color: var(--accent); }
+    .speed-btn.active, .font-size-btn.active {
+      border-color: var(--accent); background: var(--accent); color: #fff;
+    }
+
+    .confirm-dialog, .winner-dialog {
+      background: var(--bg-popover); border: 1px solid var(--border-color);
+      border-radius: 20px; padding: 24px; width: 90%; max-width: 360px;
+      text-align: center; box-shadow: var(--shadow);
+    }
+    .confirm-dialog h3, .winner-dialog h3 { font-size: 1.05rem; margin-bottom: 6px; }
+    .confirm-dialog p, .winner-dialog p {
+      font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;
+    }
+    .confirm-actions, .winner-actions { display: flex; gap: 8px; justify-content: center; }
+    .confirm-actions .btn, .winner-actions .btn { padding: 10px 20px; }
+
+    .winner-input {
+      width: 100%; padding: 10px 14px; border-radius: 10px;
+      border: 1px solid var(--border-color); background: var(--bg-cell);
+      color: var(--text-primary); font-size: 0.95rem; font-weight: 600;
+      margin-bottom: 14px; outline: none;
+    }
+    .winner-input:focus { border-color: var(--accent); }
+
+    .prize-list { display: flex; flex-direction: column; gap: 4px; }
+    .prize-item {
+      display: flex; align-items: center; gap: 6px; padding: 5px 8px;
+      background: var(--bg-cell); border-radius: 8px; font-size: 0.82rem;
+    }
+    .prize-item .prize-order { color: var(--text-secondary); font-weight: 700; font-size: 0.7rem; width: 18px; }
+    .prize-item .prize-name { flex: 1; font-weight: 600; }
+    .prize-item .prize-remove {
+      background: none; border: none; color: var(--danger); cursor: pointer;
+      font-size: 0.9rem; padding: 2px; line-height: 1;
+    }
+    .prize-item .prize-move {
+      background: none; border: none; color: var(--text-secondary); cursor: pointer;
+      font-size: 0.8rem; padding: 1px 3px; line-height: 1;
+    }
+    .prize-item .prize-move:hover { color: var(--text-primary); }
+    .add-prize-row { display: flex; gap: 6px; margin-top: 6px; }
+    .add-prize-input {
+      flex: 1; padding: 6px 10px; border-radius: 8px;
+      border: 1px solid var(--border-color); background: var(--bg-cell);
+      color: var(--text-primary); font-size: 0.82rem; outline: none;
+    }
+    .add-prize-input:focus { border-color: var(--accent); }
+    .add-prize-btn {
+      padding: 6px 12px; border-radius: 8px; border: none;
+      background: var(--accent); color: #fff; font-size: 0.82rem;
+      font-weight: 600; cursor: pointer;
+    }
+    .add-prize-btn:hover { background: var(--accent-hover); }
+
+    .delay-input-row { display: flex; align-items: center; gap: 8px; }
+    .delay-input {
+      width: 70px; padding: 6px 10px; border-radius: 8px;
+      border: 1px solid var(--border-color); background: var(--bg-cell);
+      color: var(--text-primary); font-size: 0.85rem; font-weight: 600;
+      text-align: center; outline: none;
+    }
+    .delay-input:focus { border-color: var(--accent); }
+    .delay-label { font-size: 0.85rem; color: var(--text-primary); }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+    /* ===== Mobile Landscape ===== */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .app { padding: 2px 10px; }
+      .header { padding: 1px 0; }
+      .header h1 { font-size: calc(0.85rem * var(--font-scale)); }
+      .header-actions .btn-icon { width: 28px; height: 28px; font-size: 0.8rem; }
+
+      .main-layout {
+        grid-template-columns: 180px 1fr 170px;
+        gap: 6px; padding: 2px 0;
+      }
+
+      .left-panel { gap: 3px; }
+      .pick-section { padding: 2px 0; gap: 3px; }
+      .picked-number-display {
+        width: calc(60px * var(--font-scale)); height: calc(60px * var(--font-scale));
+        font-size: calc(2rem * var(--font-scale));
+      }
+      .picked-number-display .placeholder-text { font-size: calc(0.9rem * var(--font-scale)); }
+      .pick-info { font-size: calc(0.65rem * var(--font-scale)); }
+      .pick-buttons { gap: 4px; }
+      .btn-draw { padding: 5px 0; font-size: calc(0.75rem * var(--font-scale)); border-radius: 7px; }
+      .btn-auto { width: 30px; font-size: 0.75rem; border-radius: 7px; }
+      .cooldown-bar { height: 2px; }
+      .auto-timer-section { gap: 5px; padding: 1px 0; }
+      .auto-timer-ring { width: 22px; height: 22px; }
+      .auto-timer-text { font-size: calc(0.6rem * var(--font-scale)); }
+      .winners-title { font-size: calc(0.55rem * var(--font-scale)); }
+      .winners-section { gap: 2px; }
+      .winner-btn {
+        padding: 3px 6px; font-size: calc(0.6rem * var(--font-scale));
+        border-radius: 6px; gap: 4px;
+      }
+      .winner-btn .winner-icon { font-size: 0.7rem; }
+      .winner-btn .winner-name { font-size: calc(0.5rem * var(--font-scale)); }
+      .winner-btn .undo-icon { font-size: 0.65rem; }
+
+      .grid-container { padding: 4px; border-radius: 8px; }
+      .grid { gap: 2px; }
+      .grid-cell {
+        font-size: calc(0.8rem * var(--font-scale));
+        border-radius: 4px;
+      }
+
+      .right-panel { gap: 4px; }
+      .history-section { padding: 6px; border-radius: 8px; }
+      .history-header { margin-bottom: 4px; }
+      .history-header h3 { font-size: calc(0.55rem * var(--font-scale)); }
+      .history-chip {
+        font-size: calc(0.65rem * var(--font-scale));
+        padding: 2px 5px; border-radius: 4px;
+      }
+      .history-list { gap: 3px; }
+    }
+
+    /* ===== Mobile Portrait ===== */
+    @media (max-width: 900px) and (orientation: portrait) {
+      html, body { overflow: auto; }
+      .app { height: auto; min-height: 100vh; padding: 6px 8px; overflow: visible; }
+
+      .header h1 { font-size: calc(1.1rem * var(--font-scale)); }
+
+      .main-layout {
+        display: grid;
+        grid-template-columns: minmax(140px, 200px) 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 8px;
+        min-height: 0;
+      }
+
+      /* Draw panel: top-left */
+      .left-panel {
+        grid-column: 1; grid-row: 1;
+        overflow: visible; min-height: 0;
+      }
+      .picked-number-display {
+        width: calc(80px * var(--font-scale)); height: calc(80px * var(--font-scale));
+        font-size: calc(2.5rem * var(--font-scale));
+      }
+      .picked-number-display .placeholder-text { font-size: calc(1rem * var(--font-scale)); }
+      .pick-info { font-size: calc(0.75rem * var(--font-scale)); }
+      .btn-draw { font-size: calc(0.85rem * var(--font-scale)); padding: 8px 0; }
+      .btn-auto { width: 36px; font-size: 0.85rem; }
+      .auto-timer-section { justify-content: center; }
+      .auto-timer-text { font-size: calc(0.7rem * var(--font-scale)); }
+      .winners-title { font-size: calc(0.65rem * var(--font-scale)); }
+      .winner-btn { font-size: calc(0.72rem * var(--font-scale)); padding: 5px 8px; }
+      .winner-btn .winner-name { font-size: calc(0.6rem * var(--font-scale)); }
+      .winner-btn .winner-icon { font-size: 0.85rem; }
+      .winners-section { overflow: visible; }
+
+      /* Grid: top-right */
+      .center-panel { grid-column: 2; grid-row: 1; }
+      .grid-container { padding: 5px; border-radius: 10px; }
+      .grid { gap: 2px; }
+      .grid-cell {
+        font-size: calc(0.75rem * var(--font-scale));
+        border-radius: 5px;
+      }
+
+      /* History: below, full width */
+      .right-panel {
+        grid-column: 1 / -1; grid-row: 2;
+        overflow: visible;
+      }
+      .history-section { border-radius: 10px; }
+      .history-chip {
+        font-size: calc(0.8rem * var(--font-scale));
+        padding: 3px 6px;
+      }
+
+      /* Popover adjustments */
+      .popover { padding: 18px; max-width: 95%; border-radius: 16px; }
+      .theme-options { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+      .theme-btn { font-size: 0.68rem; padding: 6px 3px; }
+      .font-size-selector { flex-wrap: wrap; }
+      .confirm-dialog, .winner-dialog { max-width: 92%; padding: 20px; }
+    }
+
+    /* ===== Small phones portrait ===== */
+    @media (max-width: 480px) and (orientation: portrait) {
+      .app { padding: 4px 6px; }
+      .header h1 { font-size: calc(0.95rem * var(--font-scale)); }
+      .main-layout {
+        grid-template-columns: minmax(120px, 160px) 1fr;
+        gap: 6px;
+      }
+      .picked-number-display {
+        width: calc(65px * var(--font-scale)); height: calc(65px * var(--font-scale));
+        font-size: calc(2rem * var(--font-scale));
+      }
+      .pick-info { font-size: calc(0.65rem * var(--font-scale)); }
+      .grid-cell { font-size: calc(0.6rem * var(--font-scale)); border-radius: 4px; }
+      .grid { gap: 1.5px; }
+      .btn-draw { font-size: calc(0.78rem * var(--font-scale)); padding: 7px 0; }
+      .btn-auto { width: 32px; font-size: 0.8rem; }
+      .winner-btn { font-size: calc(0.65rem * var(--font-scale)); padding: 4px 6px; gap: 5px; }
+      .winner-btn .winner-icon { font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1 id="appTitle">🎱 Tambola Draw</h1>
+      <div class="header-actions">
+        <button class="btn btn-icon" id="settingsBtn" title="Settings">⚙️</button>
+        <button class="btn btn-icon" id="newGameBtn" title="New Game">🔄</button>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <div class="left-panel">
+        <section class="pick-section">
+          <div class="picked-number-display" id="pickedDisplay">
+            <span class="placeholder-text" id="pickedPlaceholder">?</span>
+            <span id="pickedNumber" style="display:none;"></span>
+          </div>
+          <div class="pick-info" id="pickInfo">Pick a number to start!</div>
+        </section>
+        <div class="pick-buttons">
+          <button class="btn-draw" id="pickBtn">🎲 Draw</button>
+          <button class="btn-auto" id="autoBtn" title="Auto Draw">▶</button>
+        </div>
+        <div class="cooldown-bar"><div class="cooldown-bar-inner" id="cooldownBar"></div></div>
+        <div class="auto-timer-section" id="autoTimerSection">
+          <div class="auto-timer-ring">
+            <svg viewBox="0 0 36 36">
+              <circle class="ring-bg" cx="18" cy="18" r="15.5" />
+              <circle class="ring-fg" id="autoTimerRing" cx="18" cy="18" r="15.5"
+                stroke-dasharray="97.4" stroke-dashoffset="0" />
+            </svg>
+          </div>
+          <span class="auto-timer-text" id="autoTimerText">Next in 30s</span>
+        </div>
+        <div class="winners-title">🏆 Winners</div>
+        <div class="winners-section" id="winnersSection"></div>
+      </div>
+
+      <div class="center-panel">
+        <div class="grid-container">
+          <div class="grid" id="grid"></div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="history-section">
+          <div class="history-header">
+            <h3>📋 History</h3>
+            <div class="history-count-selector">
+              <label for="historyCount">Show:</label>
+              <select id="historyCount">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+                <option value="90" selected>All</option>
+              </select>
+            </div>
+          </div>
+          <div class="history-list" id="historyList">
+            <span class="history-empty">No numbers drawn yet.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="popover-overlay" id="settingsOverlay">
+    <div class="popover">
+      <h2>Settings <button class="close-btn" id="closeSettings">&times;</button></h2>
+
+      <div class="setting-group">
+        <label>Title</label>
+        <input type="text" class="delay-input" id="titleInput" style="width:100%;text-align:left;" value="🎱 Tambola Draw" />
+      </div>
+
+      <div class="setting-group">
+        <label>Theme</label>
+        <div class="theme-options" id="themeOptions">
+          <button class="theme-btn" data-theme="dark">🌙 Dark</button>
+          <button class="theme-btn" data-theme="light">☀️ Light</button>
+          <button class="theme-btn" data-theme="ocean">🌊 Ocean</button>
+          <button class="theme-btn" data-theme="sunset">🌅 Sunset</button>
+          <button class="theme-btn" data-theme="forest">🌲 Forest</button>
+          <button class="theme-btn" data-theme="rosegold">🌸 Rose Gold</button>
+          <button class="theme-btn" data-theme="midnight">🌌 Midnight</button>
+          <button class="theme-btn" data-theme="royal">👑 Royal</button>
+          <button class="theme-btn" data-theme="champagne">🥂 Champagne</button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label>Font Size</label>
+        <div class="font-size-selector" id="fontSizeSelector">
+          <button class="font-size-btn" data-scale="1.3">S</button>
+          <button class="font-size-btn" data-scale="1.5">M</button>
+          <button class="font-size-btn" data-scale="1.7">L</button>
+          <button class="font-size-btn" data-scale="1.9">XL</button>
+          <button class="font-size-btn" data-scale="2.1">XXL</button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label>Options</label>
+        <div class="toggle-row">
+          <span>Announce numbers (voice)</span>
+          <label class="toggle"><input type="checkbox" id="toggleAnnounce" /><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <div class="setting-group" id="announcementSpeedGroup" style="display:none;">
+        <label>Announcement Speed</label>
+        <div class="speed-selector" id="speedSelector">
+          <button class="speed-btn" data-speed="0.7">Slow</button>
+          <button class="speed-btn" data-speed="1">Normal</button>
+          <button class="speed-btn" data-speed="1.4">Fast</button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label>Auto-Draw Delay (seconds)</label>
+        <div class="delay-input-row">
+          <input type="number" class="delay-input" id="autoDelayInput" min="5" max="120" value="30" />
+          <span class="delay-label">sec between draws</span>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label>Winner Prizes</label>
+        <div class="prize-list" id="prizeList"></div>
+        <div class="add-prize-row">
+          <input type="text" class="add-prize-input" id="addPrizeInput" placeholder="New prize name..." />
+          <button class="add-prize-btn" id="addPrizeBtn">+ Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-dialog">
+      <h3>Start New Game?</h3>
+      <p>This will reset all drawn numbers and winners. This cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" id="confirmCancel">Cancel</button>
+        <button class="btn btn-danger" id="confirmReset">Reset Game</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="winner-overlay" id="winnerOverlay">
+    <div class="winner-dialog">
+      <h3 id="winnerDialogTitle">Enter Winner</h3>
+      <p id="winnerDialogDesc">Enter the winner's name for this prize.</p>
+      <input type="text" class="winner-input" id="winnerNameInput" placeholder="Winner name..." />
+      <div class="winner-actions">
+        <button class="btn btn-secondary" id="winnerCancel">Cancel</button>
+        <button class="btn btn-danger" id="winnerSave" style="background:var(--accent);">Save Winner</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="confirm-overlay" id="removePrizeOverlay">
+    <div class="confirm-dialog">
+      <h3>Remove Prize?</h3>
+      <p id="removePrizeDesc">This prize has active game data. Remove it anyway?</p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" id="removePrizeCancel">Cancel</button>
+        <button class="btn btn-danger" id="removePrizeConfirm">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="confirm-overlay" id="revertOverlay">
+    <div class="confirm-dialog">
+      <h3>Revert Winner?</h3>
+      <p id="revertDesc">Remove the winner for this prize?</p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" id="revertCancel">Cancel</button>
+        <button class="btn btn-danger" id="revertConfirm">Revert</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'tambola_game_state_v3';
+    const SETTINGS_KEY = 'tambola_settings_v3';
+    const RING_CIRCUMFERENCE = 97.4;
+
+    const DEFAULT_PRIZES = [
+      { id: 'fastest5', label: 'Fastest 5' },
+      { id: 'row1', label: '1st Row' },
+      { id: 'row2', label: '2nd Row' },
+      { id: 'row3', label: '3rd Row' },
+      { id: 'fullhouse', label: 'Full House' },
+    ];
+
+    let state = { pickedNumbers: [], lastPicked: null, winners: {} };
+
+    let settings = {
+      theme: 'dark', announce: false, announcementSpeed: 1,
+      historyCount: 90, autoDelay: 30, fontScale: 1.5,
+      title: '🎱 Tambola Draw',
+      prizes: JSON.parse(JSON.stringify(DEFAULT_PRIZES)),
+    };
+
+    let cooldownActive = false;
+    let cooldownTimer = null;
+    let autoTimeout = null;
+    let autoTimerRAF = null;
+    let autoRunning = false;
+    let autoNextPickTime = 0;
+    let activePrizeId = null;
+    let revertPrizeId = null;
+    let removePrizeIdx = null;
+    let autoPausedForSettings = false;
+    let autoPauseRemainingMs = 0;
+
+    const COOLDOWN_MS = 3000;
+
+    const $ = id => document.getElementById(id);
+    const grid = $('grid');
+    const pickedDisplay = $('pickedDisplay');
+    const pickedNumber = $('pickedNumber');
+    const pickedPlaceholder = $('pickedPlaceholder');
+    const pickInfo = $('pickInfo');
+    const pickBtn = $('pickBtn');
+    const autoBtn = $('autoBtn');
+    const cooldownBar = $('cooldownBar');
+    const autoTimerSection = $('autoTimerSection');
+    const autoTimerRing = $('autoTimerRing');
+    const autoTimerText = $('autoTimerText');
+    const historyList = $('historyList');
+    const historyCount = $('historyCount');
+    const winnersSection = $('winnersSection');
+    const settingsBtn = $('settingsBtn');
+    const settingsOverlay = $('settingsOverlay');
+    const closeSettings = $('closeSettings');
+    const newGameBtn = $('newGameBtn');
+    const confirmOverlay = $('confirmOverlay');
+    const confirmCancel = $('confirmCancel');
+    const confirmReset = $('confirmReset');
+    const toggleAnnounce = $('toggleAnnounce');
+    const speedSelector = $('speedSelector');
+    const announcementSpeedGroup = $('announcementSpeedGroup');
+    const themeOptions = $('themeOptions');
+    const fontSizeSelector = $('fontSizeSelector');
+    const autoDelayInput = $('autoDelayInput');
+    const prizeListEl = $('prizeList');
+    const addPrizeInput = $('addPrizeInput');
+    const addPrizeBtn = $('addPrizeBtn');
+    const winnerOverlay = $('winnerOverlay');
+    const winnerDialogTitle = $('winnerDialogTitle');
+    const winnerDialogDesc = $('winnerDialogDesc');
+    const winnerNameInput = $('winnerNameInput');
+    const winnerCancel = $('winnerCancel');
+    const winnerSave = $('winnerSave');
+    const revertOverlay = $('revertOverlay');
+    const revertDesc = $('revertDesc');
+    const revertCancel = $('revertCancel');
+    const revertConfirm = $('revertConfirm');
+
+    function init() {
+      loadSettings();
+      loadState();
+      buildGrid();
+      applySettings();
+      renderAll();
+    }
+
+    function buildGrid() {
+      grid.innerHTML = '';
+      for (let i = 1; i <= 90; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'grid-cell';
+        cell.textContent = i;
+        cell.id = `cell-${i}`;
+        grid.appendChild(cell);
+      }
+    }
+
+    function renderAll() {
+      renderGrid();
+      renderPickedDisplay();
+      renderHistory();
+      renderWinners();
+      renderGameComplete();
+    }
+
+    function renderGrid(justPickedNum) {
+      const len = state.pickedNumbers.length;
+      const currentNum = len > 0 ? state.pickedNumbers[len - 1] : null;
+      const previousNum = len > 1 ? state.pickedNumbers[len - 2] : null;
+
+      for (let i = 1; i <= 90; i++) {
+        const cell = document.getElementById(`cell-${i}`);
+        cell.classList.remove('picked', 'cell-current', 'cell-previous', 'just-picked');
+
+        if (state.pickedNumbers.includes(i)) {
+          cell.classList.add('picked');
+          if (i === currentNum) {
+            cell.classList.add('cell-current');
+          } else if (i === previousNum) {
+            cell.classList.add('cell-previous');
+          }
+        }
+
+        if (justPickedNum && i === justPickedNum) {
+          void cell.offsetWidth;
+          cell.classList.add('just-picked');
+        }
+      }
+    }
+
+    function renderPickedDisplay() {
+      if (state.lastPicked) {
+        pickedPlaceholder.style.display = 'none';
+        pickedNumber.style.display = 'inline';
+        pickedNumber.textContent = state.lastPicked;
+        pickInfo.textContent = `${state.pickedNumbers.length} of 90 drawn`;
+      } else {
+        pickedPlaceholder.style.display = 'inline';
+        pickedNumber.style.display = 'none';
+        pickInfo.textContent = 'Pick a number to start!';
+      }
+    }
+
+    function renderHistory() {
+      const count = settings.historyCount;
+      const nums = state.pickedNumbers.slice().reverse();
+      const visible = nums.slice(0, count);
+      if (visible.length === 0) {
+        historyList.innerHTML = '<span class="history-empty">No numbers drawn yet.</span>';
+        return;
+      }
+      historyList.innerHTML = visible.map(n =>
+        `<span class="history-chip">${n}</span>`
+      ).join('');
+    }
+
+    function renderWinners() {
+      winnersSection.innerHTML = '';
+      settings.prizes.forEach(prize => {
+        const winner = state.winners[prize.id];
+        const btn = document.createElement('div');
+        btn.className = 'winner-btn' + (winner ? ' claimed' : '');
+
+        if (winner) {
+          btn.innerHTML = `
+            <span class="winner-icon">✅</span>
+            <span class="winner-label">
+              <div>${prize.label}</div>
+              <div class="winner-name">${escapeHtml(winner)}</div>
+            </span>
+            <span class="undo-icon" data-prize="${prize.id}" title="Revert">↩️</span>
+          `;
+          btn.querySelector('.undo-icon').addEventListener('click', (e) => {
+            e.stopPropagation();
+            revertPrizeId = prize.id;
+            revertDesc.textContent = `Remove "${winner}" as winner for ${prize.label}?`;
+            revertOverlay.classList.add('open');
+          });
+        } else {
+          btn.innerHTML = `
+            <span class="winner-icon">🏆</span>
+            <span class="winner-label">${prize.label}</span>
+          `;
+          btn.addEventListener('click', () => {
+            activePrizeId = prize.id;
+            winnerDialogTitle.textContent = prize.label;
+            winnerDialogDesc.textContent = `Enter the winner's name for "${prize.label}".`;
+            winnerNameInput.value = '';
+            winnerOverlay.classList.add('open');
+            setTimeout(() => winnerNameInput.focus(), 100);
+          });
+        }
+        winnersSection.appendChild(btn);
+      });
+    }
+
+    function renderGameComplete() {
+      if (state.pickedNumbers.length === 90) {
+        pickBtn.disabled = true;
+        pickBtn.textContent = '✅ Done';
+        stopAuto();
+      } else {
+        if (!cooldownActive) pickBtn.disabled = false;
+        pickBtn.textContent = '🎲 Draw';
+      }
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    // ===== Pick Number =====
+    function pickNumber(isAutoPick) {
+      if (cooldownActive || state.pickedNumbers.length >= 90) return;
+
+      // Manual pick while auto is running => stop auto
+      if (!isAutoPick && autoRunning) {
+        stopAuto();
+      }
+
+      const remaining = [];
+      for (let i = 1; i <= 90; i++) {
+        if (!state.pickedNumbers.includes(i)) remaining.push(i);
+      }
+      if (remaining.length === 0) return;
+
+      const num = remaining[Math.floor(Math.random() * remaining.length)];
+      state.pickedNumbers.push(num);
+      state.lastPicked = num;
+      saveState();
+
+      pickedDisplay.classList.remove('pop');
+      void pickedDisplay.offsetWidth;
+      pickedDisplay.classList.add('pop');
+
+      renderGrid(num);
+      renderPickedDisplay();
+      renderHistory();
+      renderGameComplete();
+
+      if (settings.announce) announceNumber(num);
+      startCooldown();
+    }
+
+    function startCooldown() {
+      cooldownActive = true;
+      pickBtn.disabled = true;
+      const start = Date.now();
+      function tick() {
+        const elapsed = Date.now() - start;
+        const pct = Math.min(elapsed / COOLDOWN_MS * 100, 100);
+        cooldownBar.style.width = pct + '%';
+        if (elapsed < COOLDOWN_MS) {
+          cooldownTimer = requestAnimationFrame(tick);
+        } else {
+          cooldownActive = false;
+          cooldownBar.style.width = '0%';
+          if (state.pickedNumbers.length < 90) pickBtn.disabled = false;
+        }
+      }
+      tick();
+    }
+
+    // ===== Auto Draw with visual timer =====
+    function toggleAutoFn() {
+      if (autoRunning) { stopAuto(); } else { startAuto(); }
+    }
+
+    function startAuto() {
+      if (state.pickedNumbers.length >= 90) return;
+      autoRunning = true;
+      autoBtn.classList.add('active');
+      autoBtn.textContent = '⏸';
+      autoBtn.title = 'Stop Auto Draw';
+      autoTimerSection.classList.add('visible');
+
+      // Pick immediately if not on cooldown
+      if (!cooldownActive) {
+        pickNumber(true);
+      }
+      scheduleNextAutoPick();
+    }
+
+    function scheduleNextAutoPick() {
+      if (!autoRunning || state.pickedNumbers.length >= 90) { stopAuto(); return; }
+
+      const delay = Math.max(settings.autoDelay * 1000, COOLDOWN_MS + 500);
+      autoNextPickTime = Date.now() + delay;
+
+      if (autoTimerRAF) cancelAnimationFrame(autoTimerRAF);
+      function timerTick() {
+        if (!autoRunning) return;
+        const now = Date.now();
+        const remaining = Math.max(0, autoNextPickTime - now);
+        const pct = 1 - (remaining / delay);
+        const offset = RING_CIRCUMFERENCE * (1 - pct);
+        autoTimerRing.setAttribute('stroke-dashoffset', offset);
+        const secs = Math.ceil(remaining / 1000);
+        autoTimerText.textContent = `Next in ${secs}s`;
+
+        if (remaining <= 0) {
+          if (!cooldownActive) {
+            pickNumber(true);
+          }
+          scheduleNextAutoPick();
+          return;
+        }
+        autoTimerRAF = requestAnimationFrame(timerTick);
+      }
+      timerTick();
+    }
+
+    function stopAuto() {
+      autoRunning = false;
+      autoBtn.classList.remove('active');
+      autoBtn.textContent = '▶';
+      autoBtn.title = 'Auto Draw';
+      autoTimerSection.classList.remove('visible');
+      if (autoTimerRAF) { cancelAnimationFrame(autoTimerRAF); autoTimerRAF = null; }
+      if (autoTimeout) { clearTimeout(autoTimeout); autoTimeout = null; }
+      autoTimerRing.setAttribute('stroke-dashoffset', '0');
+    }
+
+    // ===== Announce =====
+    function announceNumber(num) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(`Number ${num}`);
+      u.rate = settings.announcementSpeed;
+      u.pitch = 1; u.volume = 1;
+      window.speechSynthesis.speak(u);
+    }
+
+    // ===== Persistence =====
+    function saveState() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+    }
+    function loadState() {
+      try {
+        const s = localStorage.getItem(STORAGE_KEY);
+        if (s) {
+          const p = JSON.parse(s);
+          state.pickedNumbers = p.pickedNumbers || [];
+          state.lastPicked = p.lastPicked || null;
+          state.winners = p.winners || {};
+        }
+      } catch(e) {}
+    }
+    function saveSettings() {
+      try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch(e) {}
+    }
+    function loadSettings() {
+      try {
+        const s = localStorage.getItem(SETTINGS_KEY);
+        if (s) {
+          const p = JSON.parse(s);
+          settings = { ...settings, ...p };
+          if (!settings.prizes || !settings.prizes.length) {
+            settings.prizes = JSON.parse(JSON.stringify(DEFAULT_PRIZES));
+          }
+          if (!settings.fontScale) settings.fontScale = 1.5;
+          if (!settings.title) settings.title = '🎱 Tambola Draw';
+        }
+      } catch(e) {}
+    }
+
+    // ===== Settings =====
+    function applySettings() {
+      document.documentElement.setAttribute('data-theme', settings.theme);
+      document.documentElement.style.setProperty('--font-scale', settings.fontScale);
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === settings.theme);
+      });
+      document.querySelectorAll('.font-size-btn').forEach(btn => {
+        btn.classList.toggle('active', parseFloat(btn.dataset.scale) === settings.fontScale);
+      });
+      $('appTitle').textContent = settings.title;
+      $('titleInput').value = settings.title;
+      toggleAnnounce.checked = settings.announce;
+      announcementSpeedGroup.style.display = settings.announce ? 'block' : 'none';
+      document.querySelectorAll('.speed-btn').forEach(btn => {
+        btn.classList.toggle('active', parseFloat(btn.dataset.speed) === settings.announcementSpeed);
+      });
+      historyCount.value = settings.historyCount;
+      autoDelayInput.value = settings.autoDelay;
+      renderPrizeList();
+    }
+
+    function renderPrizeList() {
+      prizeListEl.innerHTML = '';
+      settings.prizes.forEach((prize, idx) => {
+        const item = document.createElement('div');
+        item.className = 'prize-item';
+        item.innerHTML = `
+          <span class="prize-order">${idx + 1}</span>
+          <span class="prize-name">${escapeHtml(prize.label)}</span>
+          <button class="prize-move" data-dir="up" data-idx="${idx}" title="Move up">▲</button>
+          <button class="prize-move" data-dir="down" data-idx="${idx}" title="Move down">▼</button>
+          <button class="prize-remove" data-idx="${idx}" title="Remove">✕</button>
+        `;
+        prizeListEl.appendChild(item);
+      });
+
+      prizeListEl.querySelectorAll('.prize-move').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.idx);
+          const dir = btn.dataset.dir;
+          if (dir === 'up' && idx > 0) {
+            [settings.prizes[idx], settings.prizes[idx-1]] = [settings.prizes[idx-1], settings.prizes[idx]];
+          } else if (dir === 'down' && idx < settings.prizes.length - 1) {
+            [settings.prizes[idx], settings.prizes[idx+1]] = [settings.prizes[idx+1], settings.prizes[idx]];
+          }
+          saveSettings(); renderPrizeList(); renderWinners();
+        });
+      });
+
+      prizeListEl.querySelectorAll('.prize-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.idx);
+          if (state.pickedNumbers.length > 0) {
+            removePrizeIdx = idx;
+            const prize = settings.prizes[idx];
+            $('removePrizeDesc').textContent = `Game is in progress. Remove "${prize.label}" prize?`;
+            $('removePrizeOverlay').classList.add('open');
+          } else {
+            const removed = settings.prizes.splice(idx, 1)[0];
+            delete state.winners[removed.id];
+            saveSettings(); saveState(); renderPrizeList(); renderWinners();
+          }
+        });
+      });
+    }
+
+    // ===== New Game =====
+    function resetGame() {
+      state.pickedNumbers = [];
+      state.lastPicked = null;
+      state.winners = {};
+      saveState();
+      stopAuto();
+      cooldownActive = false;
+      cooldownBar.style.width = '0%';
+      if (cooldownTimer) { cancelAnimationFrame(cooldownTimer); cooldownTimer = null; }
+      renderAll();
+    }
+
+    // ===== Event Listeners =====
+    pickBtn.addEventListener('click', () => pickNumber(false));
+    autoBtn.addEventListener('click', toggleAutoFn);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' &&
+          !settingsOverlay.classList.contains('open') &&
+          !confirmOverlay.classList.contains('open') &&
+          !winnerOverlay.classList.contains('open') &&
+          !revertOverlay.classList.contains('open')) {
+        e.preventDefault();
+        pickNumber(false);
+      }
+    });
+
+    function openSettings() {
+      if (autoRunning) {
+        autoPausedForSettings = true;
+        autoPauseRemainingMs = Math.max(0, autoNextPickTime - Date.now());
+        if (autoTimerRAF) { cancelAnimationFrame(autoTimerRAF); autoTimerRAF = null; }
+        autoTimerText.textContent = 'Paused';
+      }
+      settingsOverlay.classList.add('open');
+    }
+    function closeSettingsFn() {
+      settingsOverlay.classList.remove('open');
+      if (autoPausedForSettings && autoRunning) {
+        autoPausedForSettings = false;
+        const delay = Math.max(settings.autoDelay * 1000, COOLDOWN_MS + 500);
+        autoNextPickTime = Date.now() + autoPauseRemainingMs;
+        if (autoTimerRAF) cancelAnimationFrame(autoTimerRAF);
+        function timerTick() {
+          if (!autoRunning) return;
+          const now = Date.now();
+          const remaining = Math.max(0, autoNextPickTime - now);
+          const pct = 1 - (remaining / delay);
+          const offset = RING_CIRCUMFERENCE * (1 - pct);
+          autoTimerRing.setAttribute('stroke-dashoffset', offset);
+          const secs = Math.ceil(remaining / 1000);
+          autoTimerText.textContent = `Next in ${secs}s`;
+          if (remaining <= 0) {
+            if (!cooldownActive) pickNumber(true);
+            scheduleNextAutoPick();
+            return;
+          }
+          autoTimerRAF = requestAnimationFrame(timerTick);
+        }
+        timerTick();
+      }
+      autoPausedForSettings = false;
+    }
+    settingsBtn.addEventListener('click', openSettings);
+    closeSettings.addEventListener('click', closeSettingsFn);
+    settingsOverlay.addEventListener('click', (e) => {
+      if (e.target === settingsOverlay) closeSettingsFn();
+    });
+
+    themeOptions.addEventListener('click', (e) => {
+      const btn = e.target.closest('.theme-btn');
+      if (!btn) return;
+      settings.theme = btn.dataset.theme;
+      saveSettings(); applySettings();
+    });
+
+    fontSizeSelector.addEventListener('click', (e) => {
+      const btn = e.target.closest('.font-size-btn');
+      if (!btn) return;
+      settings.fontScale = parseFloat(btn.dataset.scale);
+      saveSettings(); applySettings();
+    });
+
+    toggleAnnounce.addEventListener('change', () => {
+      settings.announce = toggleAnnounce.checked;
+      saveSettings(); applySettings();
+    });
+
+    speedSelector.addEventListener('click', (e) => {
+      const btn = e.target.closest('.speed-btn');
+      if (!btn) return;
+      settings.announcementSpeed = parseFloat(btn.dataset.speed);
+      saveSettings(); applySettings();
+    });
+
+    $('titleInput').addEventListener('input', () => {
+      settings.title = $('titleInput').value || '🎱 Tambola Draw';
+      $('appTitle').textContent = settings.title;
+      saveSettings();
+    });
+
+    autoDelayInput.addEventListener('change', () => {
+      settings.autoDelay = Math.max(5, parseInt(autoDelayInput.value) || 30);
+      autoDelayInput.value = settings.autoDelay;
+      saveSettings();
+    });
+
+    historyCount.addEventListener('change', () => {
+      settings.historyCount = parseInt(historyCount.value);
+      saveSettings(); renderHistory();
+    });
+
+    addPrizeBtn.addEventListener('click', () => {
+      const name = addPrizeInput.value.trim();
+      if (!name) return;
+      const id = 'custom_' + Date.now();
+      settings.prizes.push({ id, label: name });
+      addPrizeInput.value = '';
+      saveSettings(); renderPrizeList(); renderWinners();
+    });
+    addPrizeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') addPrizeBtn.click();
+    });
+
+    newGameBtn.addEventListener('click', () => confirmOverlay.classList.add('open'));
+    confirmCancel.addEventListener('click', () => confirmOverlay.classList.remove('open'));
+    confirmReset.addEventListener('click', () => { confirmOverlay.classList.remove('open'); resetGame(); });
+    confirmOverlay.addEventListener('click', (e) => {
+      if (e.target === confirmOverlay) confirmOverlay.classList.remove('open');
+    });
+
+    winnerCancel.addEventListener('click', () => { winnerOverlay.classList.remove('open'); activePrizeId = null; });
+    winnerOverlay.addEventListener('click', (e) => {
+      if (e.target === winnerOverlay) { winnerOverlay.classList.remove('open'); activePrizeId = null; }
+    });
+    winnerSave.addEventListener('click', () => {
+      const name = winnerNameInput.value.trim();
+      if (!name || !activePrizeId) return;
+      state.winners[activePrizeId] = name;
+      saveState();
+      winnerOverlay.classList.remove('open');
+      activePrizeId = null;
+      renderWinners();
+    });
+    winnerNameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') winnerSave.click();
+    });
+
+    $('removePrizeCancel').addEventListener('click', () => { $('removePrizeOverlay').classList.remove('open'); removePrizeIdx = null; });
+    $('removePrizeOverlay').addEventListener('click', (e) => {
+      if (e.target === $('removePrizeOverlay')) { $('removePrizeOverlay').classList.remove('open'); removePrizeIdx = null; }
+    });
+    $('removePrizeConfirm').addEventListener('click', () => {
+      if (removePrizeIdx !== null) {
+        const removed = settings.prizes.splice(removePrizeIdx, 1)[0];
+        delete state.winners[removed.id];
+        saveSettings(); saveState(); renderPrizeList(); renderWinners();
+      }
+      $('removePrizeOverlay').classList.remove('open');
+      removePrizeIdx = null;
+    });
+
+    revertCancel.addEventListener('click', () => { revertOverlay.classList.remove('open'); revertPrizeId = null; });
+    revertOverlay.addEventListener('click', (e) => {
+      if (e.target === revertOverlay) { revertOverlay.classList.remove('open'); revertPrizeId = null; }
+    });
+    revertConfirm.addEventListener('click', () => {
+      if (revertPrizeId) { delete state.winners[revertPrizeId]; saveState(); }
+      revertOverlay.classList.remove('open');
+      revertPrizeId = null;
+      renderWinners();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (settingsOverlay.classList.contains('open')) closeSettingsFn();
+        confirmOverlay.classList.remove('open');
+        winnerOverlay.classList.remove('open');
+        revertOverlay.classList.remove('open');
+        $('removePrizeOverlay').classList.remove('open');
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>
