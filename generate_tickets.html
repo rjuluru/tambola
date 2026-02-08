@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tambola Ticket Generator</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; color: #e0e0e0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .container { background: #16213e; border-radius: 16px; padding: 40px; max-width: 520px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  h1 { font-size: 1.5rem; margin-bottom: 6px; text-align: center; }
+  .subtitle { color: #aaa; margin-bottom: 24px; font-size: 0.85rem; text-align: center; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
+  .form-group input {
+    width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #334;
+    background: #0f3460; color: #e0e0e0; font-size: 0.95rem; outline: none;
+  }
+  .form-group input:focus { border-color: #e94560; }
+  .form-row { display: flex; gap: 12px; }
+  .form-row .form-group { flex: 1; }
+  .hint { font-size: 0.78rem; color: #888; margin-top: 4px; }
+  .validation { font-size: 0.82rem; margin-top: 6px; padding: 8px 12px; border-radius: 8px; background: #0f3460; text-align: center; }
+  .validation.ok { color: #4ade80; }
+  .validation.bad { color: #f87171; }
+  .btn { background: #e94560; color: #fff; border: none; padding: 14px 32px; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s; width: 100%; }
+  .btn:hover { background: #c73650; }
+  .btn:disabled { background: #555; cursor: not-allowed; }
+  .status { margin-top: 20px; font-size: 0.9rem; min-height: 24px; text-align: center; }
+  .preview { margin-top: 20px; background: #0f3460; border-radius: 10px; padding: 16px; text-align: left; font-size: 0.8rem; max-height: 300px; overflow-y: auto; display: none; }
+  .preview pre { white-space: pre-wrap; word-break: break-all; color: #ccc; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🎫 Tambola Ticket Generator</h1>
+  <p class="subtitle">Generate valid Tambola tickets with unique alphanumeric IDs</p>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Number of tickets</label>
+      <input type="number" id="ticketCount" min="1" max="10000" value="300">
+    </div>
+    <div class="form-group">
+      <label>ID length</label>
+      <input type="number" id="idLength" min="2" max="20" value="6">
+    </div>
+  </div>
+  <div class="validation" id="validation"></div>
+
+  <div style="margin-top: 16px;">
+    <button class="btn" id="generateBtn">Generate & Download</button>
+  </div>
+  <div class="status" id="status"></div>
+  <div class="preview" id="preview"><pre id="previewText"></pre></div>
+</div>
+
+<script>
+  const ticketCountInput = document.getElementById('ticketCount');
+  const idLengthInput = document.getElementById('idLength');
+  const validationEl = document.getElementById('validation');
+  const generateBtn = document.getElementById('generateBtn');
+
+  const CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
+  function maxUniqueIds(len) {
+    return Math.pow(CHARS.length, len); // 30^len
+  }
+
+  function validate() {
+    const count = parseInt(ticketCountInput.value) || 0;
+    const len = parseInt(idLengthInput.value) || 0;
+
+    if (count < 1 || len < 2) {
+      validationEl.textContent = 'Enter valid values';
+      validationEl.className = 'validation bad';
+      generateBtn.disabled = true;
+      return;
+    }
+
+    const maxIds = maxUniqueIds(len);
+    if (count > maxIds) {
+      validationEl.innerHTML = `❌ ID length ${len} supports max <strong>${maxIds.toLocaleString()}</strong> unique IDs, but you need ${count.toLocaleString()}. Increase ID length.`;
+      validationEl.className = 'validation bad';
+      generateBtn.disabled = true;
+    } else {
+      const usage = ((count / maxIds) * 100).toFixed(2);
+      validationEl.innerHTML = `✅ ID length ${len} supports <strong>${maxIds.toLocaleString()}</strong> unique IDs (using ${usage}%)`;
+      validationEl.className = 'validation ok';
+      generateBtn.disabled = false;
+    }
+  }
+
+  ticketCountInput.addEventListener('input', validate);
+  idLengthInput.addEventListener('input', validate);
+  validate();
+
+  function generateId(len) {
+    let id = '';
+    for (let i = 0; i < len; i++) id += CHARS[Math.floor(Math.random() * CHARS.length)];
+    return id;
+  }
+
+  function generateTicket() {
+    const colRanges = [];
+    for (let c = 0; c < 9; c++) {
+      const start = c === 0 ? 1 : c * 10;
+      const end = c === 8 ? 90 : c * 10 + 9;
+      const nums = [];
+      for (let n = start; n <= end; n++) nums.push(n);
+      colRanges.push(nums);
+    }
+
+    let ticket, success = false;
+
+    for (let attempt = 0; attempt < 100; attempt++) {
+      ticket = [[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+
+      let colCounts = new Array(9).fill(1);
+      let remaining = 6;
+      while (remaining > 0) {
+        const col = Math.floor(Math.random() * 9);
+        if (colCounts[col] < 3) { colCounts[col]++; remaining--; }
+      }
+
+      const colNumbers = [];
+      for (let c = 0; c < 9; c++) {
+        const available = [...colRanges[c]];
+        const picked = [];
+        for (let i = 0; i < colCounts[c]; i++) {
+          const idx = Math.floor(Math.random() * available.length);
+          picked.push(available.splice(idx, 1)[0]);
+        }
+        picked.sort((a, b) => a - b);
+        colNumbers.push(picked);
+      }
+
+      const rowCounts = [0, 0, 0];
+      const assignments = new Array(9).fill(null).map(() => []);
+      let valid = true;
+      const colOrder = [0,1,2,3,4,5,6,7,8].sort((a, b) => colCounts[b] - colCounts[a]);
+
+      for (const c of colOrder) {
+        const count = colCounts[c];
+        const rows = [0, 1, 2];
+        rows.sort((a, b) => rowCounts[a] - rowCounts[b]);
+        const chosen = rows.slice(0, count);
+        for (const r of chosen) {
+          if (rowCounts[r] >= 5) { valid = false; break; }
+          rowCounts[r]++;
+        }
+        if (!valid) break;
+        chosen.sort((a, b) => a - b);
+        assignments[c] = chosen;
+      }
+
+      if (!valid || rowCounts[0] !== 5 || rowCounts[1] !== 5 || rowCounts[2] !== 5) continue;
+
+      for (let c = 0; c < 9; c++) {
+        for (let i = 0; i < assignments[c].length; i++) {
+          ticket[assignments[c][i]][c] = colNumbers[c][i];
+        }
+      }
+      success = true;
+      break;
+    }
+
+    return success ? ticket : null;
+  }
+
+  function generateAllTickets(count, idLen) {
+    const usedIds = new Set();
+    const tickets = [];
+    for (let i = 0; i < count; i++) {
+      let id;
+      do { id = generateId(idLen); } while (usedIds.has(id));
+      usedIds.add(id);
+      let ticket = null;
+      while (!ticket) { ticket = generateTicket(); }
+      tickets.push({ id, rows: ticket });
+    }
+    return tickets;
+  }
+
+  generateBtn.addEventListener('click', () => {
+    const count = parseInt(ticketCountInput.value);
+    const idLen = parseInt(idLengthInput.value);
+    const statusEl = document.getElementById('status');
+    const preview = document.getElementById('preview');
+    const previewText = document.getElementById('previewText');
+
+    generateBtn.disabled = true;
+    statusEl.textContent = `Generating ${count} tickets...`;
+    statusEl.style.color = '#facc15';
+
+    setTimeout(() => {
+      try {
+        const tickets = generateAllTickets(count, idLen);
+        const json = JSON.stringify(tickets, null, 2);
+
+        // Download finalTickets.js (for print_tickets.html)
+        const jsContent = 'const TICKETS_DATA = ' + json + ';';
+        const jsBlob = new Blob([jsContent], { type: 'application/javascript' });
+        const jsUrl = URL.createObjectURL(jsBlob);
+        const jsLink = document.createElement('a');
+        jsLink.href = jsUrl;
+        jsLink.download = 'finalTickets.js';
+        jsLink.click();
+        URL.revokeObjectURL(jsUrl);
+
+        // Also download finalTickets.json (for reference)
+        setTimeout(() => {
+          const jsonBlob = new Blob([json], { type: 'application/json' });
+          const jsonUrl = URL.createObjectURL(jsonBlob);
+          const jsonLink = document.createElement('a');
+          jsonLink.href = jsonUrl;
+          jsonLink.download = 'finalTickets.json';
+          jsonLink.click();
+          URL.revokeObjectURL(jsonUrl);
+        }, 500);
+
+        statusEl.textContent = `✅ Generated ${tickets.length} tickets (ID length: ${idLen}) — downloaded finalTickets.js & finalTickets.json`;
+        statusEl.style.color = '#4ade80';
+
+        preview.style.display = 'block';
+        previewText.textContent = `Sample ticket:\n${JSON.stringify(tickets[0], null, 2)}\n\n... (${tickets.length} total)`;
+
+        generateBtn.disabled = false;
+      } catch (e) {
+        statusEl.textContent = '❌ Error: ' + e.message;
+        statusEl.style.color = '#f87171';
+        generateBtn.disabled = false;
+      }
+    }, 50);
+  });
+</script>
+</body>
+</html>

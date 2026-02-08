@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tambola Ticket Printer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; color: #e0e0e0; }
+
+  /* ===== Config Panel ===== */
+  .config-panel {
+    max-width: 600px; margin: 40px auto; background: #16213e;
+    border-radius: 16px; padding: 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+  .config-panel h1 { font-size: 1.5rem; margin-bottom: 6px; text-align: center; }
+  .config-panel .subtitle { color: #aaa; font-size: 0.85rem; text-align: center; margin-bottom: 24px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
+  .form-group input, .form-group select {
+    width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #334;
+    background: #0f3460; color: #e0e0e0; font-size: 0.95rem; outline: none;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: #e94560; }
+  .form-row { display: flex; gap: 12px; }
+  .form-row .form-group { flex: 1; }
+  .btn { background: #e94560; color: #fff; border: none; padding: 14px 32px; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s; width: 100%; }
+  .btn:hover { background: #c73650; }
+  .btn:disabled { background: #555; cursor: not-allowed; }
+  .btn-secondary { background: #0f3460; border: 1px solid #334; margin-top: 10px; }
+  .btn-secondary:hover { background: #1a4a7a; }
+  .status { margin-top: 16px; font-size: 0.9rem; min-height: 24px; text-align: center; }
+  .error { color: #f87171; }
+  .success { color: #4ade80; }
+  .file-info { background: #0f3460; border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 0.85rem; color: #aaa; text-align: center; }
+  .file-info strong { color: #e0e0e0; }
+  .info-bar { background: #0f3460; border-radius: 8px; padding: 10px; text-align: center; font-size: 0.85rem; color: #aaa; margin-bottom: 16px; }
+  .info-bar strong { color: #e0e0e0; }
+
+  /* ===== Page: exact A4 dimensions in mm ===== */
+  .page {
+    background: #fff; color: #000;
+    display: grid;
+    padding: 6mm;
+    align-content: center;
+    justify-content: center;
+    gap: 0;
+  }
+
+  /* ===== Ticket ===== */
+  .ticket {
+    padding: 3mm 4mm;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+  .ticket-header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 1.5mm; padding-bottom: 1mm; border-bottom: 1px solid #ccc;
+    gap: 4px; min-width: 0;
+  }
+  .ticket-title { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ticket-serial { font-weight: 700; color: #333; white-space: nowrap; }
+  .ticket-id { color: #777; font-family: monospace; white-space: nowrap; }
+  .ticket-grid {
+    display: grid; grid-template-columns: repeat(9, minmax(0, 1fr));
+    grid-template-rows: repeat(3, 1fr);
+    flex: 1; border: 1px solid #444;
+    min-width: 0;
+  }
+  .ticket-cell {
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; border: 0.5px solid #ccc;
+    padding: 2px 1px; min-width: 0; overflow: hidden;
+  }
+  .ticket-cell.has-number { background: transparent; }
+  .ticket-cell.empty { background: #f7f7f7; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* Dashed cut lines: only between adjacent tickets */
+  .cut-right { border-right: 1.5px dashed #aaa; }
+  .cut-bottom { border-bottom: 1.5px dashed #aaa; }
+
+  /* ===== Screen: preview wrapper scales pages ===== */
+  #printArea { margin: 30px auto; }
+  .page-wrapper {
+    margin: 0 auto 24px auto;
+    overflow: hidden;
+  }
+  .page-wrapper .page {
+    transform-origin: top left;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.4);
+    border-radius: 4px;
+  }
+
+  /* ===== Print: remove scale, keep mm dimensions ===== */
+  @media print {
+    body { background: #fff; color: #000; }
+    .config-panel { display: none !important; }
+    #printArea { margin: 0; }
+    .page-wrapper {
+      margin: 0; overflow: visible;
+      width: auto !important; height: auto !important;
+    }
+    .page-wrapper .page {
+      transform: none !important;
+      box-shadow: none; border-radius: 0;
+      page-break-after: always;
+    }
+    .page-wrapper:last-child .page { page-break-after: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="config-panel">
+  <h1>🖨️ Tambola Ticket Printer</h1>
+  <p class="subtitle">Configure layout and print tickets on A4 sheets</p>
+
+  <div class="file-info" id="fileInfo">⏳ Loading tickets...</div>
+
+  <div class="form-group">
+    <label>Number of tickets to print</label>
+    <input type="number" id="numTickets" min="1" value="30" placeholder="e.g. 30">
+  </div>
+
+  <div class="form-group">
+    <label>Title text (printed on each ticket)</label>
+    <input type="text" id="titleText" value="🎱 Tambola" placeholder="e.g. Diwali Tambola 2026">
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Columns per page</label>
+      <input type="number" id="colsPerPage" min="1" value="2">
+    </div>
+    <div class="form-group">
+      <label>Rows per page</label>
+      <input type="number" id="rowsPerPage" min="1" value="5">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Page orientation</label>
+    <select id="orientation">
+      <option value="portrait" selected>Portrait</option>
+      <option value="landscape">Landscape</option>
+    </select>
+  </div>
+
+  <div class="info-bar">
+    Tickets per page: <strong id="perPageDisplay">6</strong> &nbsp;|&nbsp;
+    Pages needed: <strong id="pagesDisplay">5</strong>
+  </div>
+
+  <button class="btn" id="generateBtn" disabled>Generate Preview</button>
+  <button class="btn btn-secondary" id="printBtn" style="display:none;">🖨️ Print</button>
+
+  <div class="status" id="status"></div>
+</div>
+
+<div id="printArea"></div>
+
+<script src="finalTickets.js"></script>
+<script>
+  let allTickets = [];
+
+  const fileInfo = document.getElementById('fileInfo');
+  const numTicketsInput = document.getElementById('numTickets');
+  const titleTextInput = document.getElementById('titleText');
+  const colsInput = document.getElementById('colsPerPage');
+  const rowsInput = document.getElementById('rowsPerPage');
+  const orientationSelect = document.getElementById('orientation');
+  const perPageDisplay = document.getElementById('perPageDisplay');
+  const pagesDisplay = document.getElementById('pagesDisplay');
+  const generateBtn = document.getElementById('generateBtn');
+  const printBtn = document.getElementById('printBtn');
+  const statusEl = document.getElementById('status');
+  const printArea = document.getElementById('printArea');
+
+  function updateInfo() {
+    const cols = Math.max(1, parseInt(colsInput.value) || 1);
+    const rows = Math.max(1, parseInt(rowsInput.value) || 1);
+    const perPage = cols * rows;
+    const num = parseInt(numTicketsInput.value) || 0;
+    const pages = num > 0 ? Math.ceil(num / perPage) : 0;
+    perPageDisplay.textContent = perPage;
+    pagesDisplay.textContent = pages;
+  }
+
+  colsInput.addEventListener('input', updateInfo);
+  rowsInput.addEventListener('input', updateInfo);
+  numTicketsInput.addEventListener('input', updateInfo);
+
+  // Load tickets from finalTickets.js
+  try {
+    if (typeof TICKETS_DATA !== 'undefined' && Array.isArray(TICKETS_DATA) && TICKETS_DATA.length > 0) {
+      allTickets = TICKETS_DATA;
+      fileInfo.innerHTML = `✅ Loaded <strong>${allTickets.length}</strong> tickets`;
+      generateBtn.disabled = false;
+    } else {
+      throw new Error('No ticket data found');
+    }
+  } catch (err) {
+    fileInfo.innerHTML = `❌ Could not load tickets — <span style="color:#f87171;">Make sure finalTickets.js exists in the same folder</span>`;
+    generateBtn.disabled = true;
+  }
+
+  function shuffleArray(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function calcFontSize(cols, rows) {
+    const total = cols * rows;
+    if (total <= 2) return '11pt';
+    if (total <= 4) return '9.5pt';
+    if (total <= 6) return '8pt';
+    if (total <= 9) return '7pt';
+    if (total <= 12) return '6pt';
+    if (total <= 16) return '5.5pt';
+    return '5pt';
+  }
+
+  function buildTicketHTML(ticket, title, serial, isLastCol, isLastRow) {
+    let cutClass = '';
+    if (!isLastCol) cutClass += ' cut-right';
+    if (!isLastRow) cutClass += ' cut-bottom';
+
+    let cells = '';
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 9; c++) {
+        const num = ticket.rows[r][c];
+        cells += num > 0
+          ? `<div class="ticket-cell has-number">${num}</div>`
+          : `<div class="ticket-cell empty"></div>`;
+      }
+    }
+    return `<div class="ticket${cutClass}">
+        <div class="ticket-header">
+          <span class="ticket-title">${title}</span>
+          <span class="ticket-serial">${serial}</span>
+          <span class="ticket-id">#${ticket.id}</span>
+        </div>
+        <div class="ticket-grid">${cells}</div>
+      </div>`;
+  }
+
+  function buildPages(tickets, title, cols, rows) {
+    const perPage = cols * rows;
+    const pages = [];
+    for (let i = 0; i < tickets.length; i += perPage) {
+      const pageTickets = tickets.slice(i, i + perPage);
+      let html = '';
+      for (let j = 0; j < perPage; j++) {
+        const col = j % cols;
+        const row = Math.floor(j / cols);
+        const isLastCol = col === cols - 1;
+        const isLastRow = row === rows - 1;
+        if (j < pageTickets.length) {
+          html += buildTicketHTML(pageTickets[j], title, i + j + 1, isLastCol, isLastRow);
+        } else {
+          let cutClass = '';
+          if (!isLastCol) cutClass += ' cut-right';
+          if (!isLastRow) cutClass += ' cut-bottom';
+          html += `<div class="ticket${cutClass}" style="visibility:hidden;"></div>`;
+        }
+      }
+      pages.push(html);
+    }
+    return pages;
+  }
+
+  function setPageSize(orient) {
+    let existing = document.getElementById('dynamicPageStyle');
+    if (existing) existing.remove();
+    const style = document.createElement('style');
+    style.id = 'dynamicPageStyle';
+    style.textContent = `@media print { @page { size: ${orient === 'landscape' ? '297mm 210mm' : '210mm 297mm'}; margin: 0; } }`;
+    document.head.appendChild(style);
+  }
+
+  generateBtn.addEventListener('click', () => {
+    const num = parseInt(numTicketsInput.value);
+    const title = titleTextInput.value || 'Tambola';
+    const cols = Math.max(1, parseInt(colsInput.value) || 1);
+    const rows = Math.max(1, parseInt(rowsInput.value) || 1);
+    const orient = orientationSelect.value;
+    const fontSize = calcFontSize(cols, rows);
+
+    if (!num || num < 1) {
+      statusEl.textContent = '❌ Enter a valid number of tickets';
+      statusEl.className = 'status error';
+      return;
+    }
+    if (num > allTickets.length) {
+      statusEl.textContent = `❌ Only ${allTickets.length} tickets available`;
+      statusEl.className = 'status error';
+      return;
+    }
+
+    const shuffled = shuffleArray(allTickets);
+    const selected = shuffled.slice(0, num);
+    const pages = buildPages(selected, title, cols, rows);
+
+    // A4 dimensions in mm
+    const pageW = orient === 'landscape' ? 297 : 210;
+    const pageH = orient === 'landscape' ? 210 : 297;
+
+    // Grid style — page uses exact mm dimensions, grid fills it
+    const gridStyle = `width:${pageW}mm; height:${pageH}mm; grid-template-columns:repeat(${cols}, 1fr); grid-template-rows:repeat(${rows}, 1fr); font-size:${fontSize};`;
+
+    setPageSize(orient);
+
+    // Scale factor: fit the mm-based page into screen width
+    // 1mm ≈ 3.7795px at 96dpi
+    const pageWidthPx = pageW * 3.7795;
+    const pageHeightPx = pageH * 3.7795;
+    const containerWidth = Math.min(860, window.innerWidth - 60);
+    const scale = containerWidth / pageWidthPx;
+    const scaledW = pageWidthPx * scale;
+    const scaledH = pageHeightPx * scale;
+
+    printArea.innerHTML = pages.map(html =>
+      `<div class="page-wrapper" style="width:${scaledW}px; height:${scaledH}px;">
+        <div class="page" style="${gridStyle} transform:scale(${scale});">${html}</div>
+      </div>`
+    ).join('');
+
+    printBtn.style.display = 'block';
+    statusEl.textContent = `✅ ${num} tickets across ${pages.length} pages (randomly selected) — scroll down to preview`;
+    statusEl.className = 'status success';
+
+    printArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  printBtn.addEventListener('click', () => window.print());
+
+  updateInfo();
+</script>
+</body>
+</html>
